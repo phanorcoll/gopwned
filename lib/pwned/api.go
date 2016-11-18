@@ -20,6 +20,7 @@ type PwnedData struct {
 }
 
 func GetEmail(e string) {
+	red := color.New(color.FgRed).PrintfFunc()
 	if e != "" {
 		if !emailvalidation.Validate(e) {
 			fmt.Printf("the email %v is not valid, please verify and try again \n", e)
@@ -27,7 +28,7 @@ func GetEmail(e string) {
 			getApiData(e)
 		}
 	} else {
-		fmt.Println("You must specify an email account [ USAGE -> gopwned verify <email> ]")
+		red("You must specify an email account [ USAGE -> gopwned verify <email> ]\n")
 	}
 }
 
@@ -53,12 +54,14 @@ func getApiData(e string) {
 		log.Println(err)
 	}
 
-	fmt.Printf("********************* Breaches where the email %v was found ********************* \n", e)
+	color.Yellow("\n********************* Breaches where the email %v was found ********************* \n", e)
 	red := color.New(color.FgRed).PrintfFunc()
 	for _, breach := range records {
+		color.Blue("Domain\n")
+		red(" -%v\n", breach.Domain)
 		color.Blue("Company\n")
-		red("%v -  Domain %v \n\n", breach.Title, breach.Domain)
+		red(" -%v\n\n", breach.Title)
 	}
-	fmt.Printf("You can get detail information using gopwned verify user@example.com --domain adobe.com \n")
-	fmt.Printf("*********************           End of Breaches             ********************* \n")
+	notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
+	notice("TIP: You can get detail information using gopwned verify user@example.com --domain adobe.com \n\n")
 }
