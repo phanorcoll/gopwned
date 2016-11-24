@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"text/tabwriter"
 
 	"github.com/fatih/color"
+	raven "github.com/getsentry/raven-go"
 
 	emailvalidation "bitbucket.com/phanorcoll/clipwned/lib/emailValidation"
 )
@@ -35,6 +38,7 @@ func GetEmail(e string) {
 func getApiData(e string) {
 	req, err := http.NewRequest("GET", URL_API+e, nil)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		log.Fatal("Error getting the API: ", err)
 		return
 	}
@@ -42,6 +46,7 @@ func getApiData(e string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		raven.CaptureErrorAndWait(err, nil)
 		log.Fatal("Do: ", err)
 		return
 	}
@@ -54,14 +59,18 @@ func getApiData(e string) {
 		log.Println(err)
 	}
 
-	color.Yellow("\n********************* Breaches where the email %v was found ********************* \n", e)
-	red := color.New(color.FgRed).PrintfFunc()
+	c := color.New(color.FgRed).Add(color.Underline).Add(color.Bold)
+	c.Printf("\nBreaches for %v : \n\n", e)
+
+	const padding = 10
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.DiscardEmptyColumns)
+	fmt.Fprintf(w, "%v\t%v\n", color.RedString("Company"), color.RedString("Domain"))
+
 	for _, breach := range records {
-		color.Blue("Domain\n")
-		red(" -%v\n", breach.Domain)
-		color.Blue("Company\n")
-		red(" -%v\n\n", breach.Title)
+		fmt.Fprintln(w, "-"+color.WhiteString(breach.Title)+"\t"+" -"+color.WhiteString(breach.Domain))
 	}
-	notice := color.New(color.Bold, color.FgGreen).PrintlnFunc()
-	notice("TIP: You can get detail information using gopwned verify user@example.com --domain adobe.com \n\n")
+	w.Flush()
+
+	notice := color.New(color.Bold, color.FgRed).PrintlnFunc()
+	notice("\n\nTIP: You can get detail information using -> gopwned verify user@example.com --domain adobe.com \n\n")
 }
