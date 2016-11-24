@@ -59,18 +59,24 @@ func getApiData(e string) {
 		log.Println(err)
 	}
 
-	c := color.New(color.FgRed).Add(color.Underline).Add(color.Bold)
-	c.Printf("\nBreaches for %v : \n\n", e)
+	if len(records) > 0 {
 
-	const padding = 10
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.DiscardEmptyColumns)
-	fmt.Fprintf(w, "%v\t%v\n", color.RedString("Company"), color.RedString("Domain"))
+		c := color.New(color.FgRed).Add(color.Underline).Add(color.Bold)
+		c.Printf("\nBreaches for %v : \n\n", e)
 
-	for _, breach := range records {
-		fmt.Fprintln(w, "-"+color.WhiteString(breach.Title)+"\t"+" -"+color.WhiteString(breach.Domain))
+		const padding = 10
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.DiscardEmptyColumns)
+		fmt.Fprintf(w, "%v\t%v\n", color.RedString("Company"), color.RedString("Domain"))
+
+		for _, breach := range records {
+			fmt.Fprintln(w, "-"+color.WhiteString(breach.Title)+"\t"+" -"+color.WhiteString(breach.Domain))
+		}
+		w.Flush()
+
+		tip := color.New(color.Bold, color.FgRed).PrintlnFunc()
+		tip("\n\nTIP: You can get detail information using -> gopwned verify user@example.com --domain adobe.com \n\n")
+	} else {
+		noBreaches := color.New(color.Bold, color.FgGreen).PrintlnFunc()
+		noBreaches("\n\nThe email [ " + e + " ] is safe for now! \n\n")
 	}
-	w.Flush()
-
-	notice := color.New(color.Bold, color.FgRed).PrintlnFunc()
-	notice("\n\nTIP: You can get detail information using -> gopwned verify user@example.com --domain adobe.com \n\n")
 }
