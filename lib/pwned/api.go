@@ -22,6 +22,9 @@ type PwnedData struct {
 	Domain     string `json:"Domain"`
 }
 
+/**
+ * verifies that the email is well formatted
+ */
 func GetEmail(e string) {
 	red := color.New(color.FgRed).PrintfFunc()
 	if e != "" {
@@ -35,6 +38,9 @@ func GetEmail(e string) {
 	}
 }
 
+/**
+ * gets the data from the API and returns the content to the users
+ */
 func getApiData(e string) {
 	req, err := http.NewRequest("GET", URL_API+e, nil)
 	if err != nil {
@@ -53,13 +59,13 @@ func getApiData(e string) {
 
 	defer resp.Body.Close()
 
-	var records []PwnedData
+	var breaches []PwnedData
 
-	if err := json.NewDecoder(resp.Body).Decode(&records); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&breaches); err != nil {
 		log.Println(err)
 	}
 
-	if len(records) > 0 {
+	if len(breaches) > 0 {
 
 		c := color.New(color.FgRed).Add(color.Underline).Add(color.Bold)
 		c.Printf("\nBreaches for %v : \n\n", e)
@@ -68,7 +74,7 @@ func getApiData(e string) {
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.DiscardEmptyColumns)
 		fmt.Fprintf(w, "%v\t%v\n", color.RedString("Company"), color.RedString("Domain"))
 
-		for _, breach := range records {
+		for _, breach := range breaches {
 			fmt.Fprintln(w, "-"+color.WhiteString(breach.Title)+"\t"+" -"+color.WhiteString(breach.Domain))
 		}
 		w.Flush()
