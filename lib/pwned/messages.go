@@ -1,18 +1,31 @@
 package pwned
 
-const breachTmpl = `
+const breachesTmpl = `
 
 Hello!
 
-The email account has been compromised in a security breach related to the following domain(s):
+The email account has been compromised in a security breach related to the following Companies:
 
 
-Affected websites:
+Affected Companies:
 
+	Name			Breach Date:
 {{range .}}
-	- {{.Domain}}
+	-{{.Name}}			*{{.BreachDate}}
 {{end}}
 
-TIP: You can get detail information using: gopwned verify user@example.com --domain <domain-name>
+TIP: You can get detail information using: gopwned company <name>
+
+`
+const breachTmpl = `
+
+Information about the breach
+-----------------------------
+{{.BreachDate}}
+{{.Name}}
+{{.Title}}
+{{.Domain}}
+{{.AddedDate}}
+{{.Description}}
 
 `
