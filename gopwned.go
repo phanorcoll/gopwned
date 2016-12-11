@@ -22,14 +22,23 @@ func main() {
 	}
 	app.Copyright = "(c) 2016 Phanor Coll"
 	app.Usage = "Check to see if an email account has been compromised in a data breach!"
-	app.UsageText = "gopwned verify <email>"
+	app.UsageText = "gopwned verify <email> \n   gopwned company <name>"
 
 	app.Commands = []cli.Command{
 		{
-			Name:  "verify",
-			Usage: "Verifys the email account provided",
+			Name:      "verify",
+			Usage:     "Verifys the email account provided",
+			ArgsUsage: "<email-address>",
 			Action: func(c *cli.Context) {
-				pwned.GetEmail(c.Args().First())
+				pwned.GetBreaches(c.Args().First())
+			},
+		},
+		{
+			Name:      "company",
+			Usage:     "Gets complete information about the breach",
+			ArgsUsage: "<name>",
+			Action: func(c *cli.Context) {
+				pwned.GetBreachData(c.Args().First())
 			},
 		},
 	}
