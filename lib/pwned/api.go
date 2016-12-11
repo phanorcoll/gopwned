@@ -13,31 +13,79 @@ import (
 )
 
 type PwnedData struct {
-	Domain string `json:"Domain"`
+	Title       string `json:"Title"`
+	Name        string `json:"Name"`
+	Domain      string `json:"Domain"`
+	BreachDate  string `json:"BreachDate"`
+	AddedDate   string `json:"AddedDate"`
+	Description string `json:"Description"`
 }
 
 const URL_API string = "https://haveibeenpwned.com/api/v2/breachedaccount/"
+const URL_API_BREACH string = "https://haveibeenpwned.com/api/v2/breach/"
 
-/**
- * verifies that the email is well formatted
- */
-func GetEmail(e string) {
+func GetBreaches(e string) {
 	ErrorMessage := color.New(color.Bold, color.FgRed).PrintlnFunc()
 	if e != "" {
 		if !emailvalidation.Validate(e) {
 			ErrorMessage("\n\nThe email [ " + e + " ] is not valid, please verify and try again! \n\n")
 		} else {
-			getApiData(e)
+			breachList(e)
 		}
 	} else {
 		ErrorMessage("\n\nYou must specify an email account, run gopwned -h for more information. \n\n")
 	}
 }
 
+func GetBreachData(nameCompany string) {
+	ErrorMessage := color.New(color.Bold, color.FgRed).PrintlnFunc()
+	if nameCompany != "" {
+		breachData(nameCompany)
+	} else {
+		ErrorMessage("\n\nYou must specify the name of the company, run gopwned -h for more information. \n\n")
+	}
+}
+
+func breachData(nameCompany string) {
+	noBreaches := color.New(color.Bold, color.FgGreen).PrintlnFunc()
+	req, err := http.NewRequest("GET", URL_API_BREACH+nameCompany, nil)
+
+	if err != nil {
+		log.Fatal("Error getting the API: ", err)
+		return
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal("Do: ", err)
+		return
+	}
+
+	defer resp.Body.Close()
+
+	var bData []PwnedData
+
+	if err := json.NewDecoder(resp.Body).Decode(&bData); err != nil {
+		log.Fatal(err)
+	}
+
+	if len(bData) > 0 {
+
+		breachTemplate := template.Must(template.New("breachMessage").Parse(breachTmpl))
+		if err := breachTemplate.Execute(os.Stdout, bData); err != nil {
+			panic(err)
+		}
+
+	} else {
+		noBreaches("\n\n The company [ " + nameCompany + " ] is not in out database, please verify the name and try again! \n\n")
+	}
+}
+
 /**
  * gets the data from the API and returns the content to the users
  */
-func getApiData(e string) {
+func breachList(e string) {
 	noBreaches := color.New(color.Bold, color.FgGreen).PrintlnFunc()
 	req, err := http.NewRequest("GET", URL_API+e, nil)
 
@@ -63,7 +111,7 @@ func getApiData(e string) {
 
 	if len(breaches) > 0 {
 
-		breachTemplate := template.Must(template.New("breachMessage").Parse(breachTmpl))
+		breachTemplate := template.Must(template.New("breachMessage").Parse(breachesTmpl))
 		if err := breachTemplate.Execute(os.Stdout, breaches); err != nil {
 			panic(err)
 		}
