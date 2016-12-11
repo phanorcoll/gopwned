@@ -5,13 +5,9 @@ import (
 	"time"
 
 	"bitbucket.com/phanorcoll/clipwned/lib/pwned"
-	raven "github.com/getsentry/raven-go"
+
 	"github.com/urfave/cli"
 )
-
-func init() {
-	raven.SetDSN("https://778bf3fe9e124a8293467ecf0098e361:9ebed7afc7d74167af0b1972eb183592@sentry.io/115941")
-}
 
 func main() {
 
@@ -33,7 +29,7 @@ func main() {
 			Name:  "verify",
 			Usage: "Verifys the email account provided",
 			Action: func(c *cli.Context) {
-				pwnedapi.GetEmail(c.Args().First())
+				pwned.GetEmail(c.Args().First())
 			},
 		},
 	}
