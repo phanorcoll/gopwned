@@ -1,40 +1,36 @@
-package pwnedapi
+package pwned
 
 import (
 	"encoding/json"
-	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
-	"text/tabwriter"
-
-	"github.com/fatih/color"
-	raven "github.com/getsentry/raven-go"
 
 	emailvalidation "bitbucket.com/phanorcoll/clipwned/lib/emailValidation"
+
+	"github.com/fatih/color"
 )
 
-var URL_API string = "https://haveibeenpwned.com/api/v2/breachedaccount/"
-
 type PwnedData struct {
-	Title      string `json:"Title"`
-	BreachDate string `json:"BreachDate"`
-	Domain     string `json:"Domain"`
+	Domain string `json:"Domain"`
 }
+
+const URL_API string = "https://haveibeenpwned.com/api/v2/breachedaccount/"
 
 /**
  * verifies that the email is well formatted
  */
 func GetEmail(e string) {
-	red := color.New(color.FgRed).PrintfFunc()
+	ErrorMessage := color.New(color.Bold, color.FgRed).PrintlnFunc()
 	if e != "" {
 		if !emailvalidation.Validate(e) {
-			fmt.Printf("the email %v is not valid, please verify and try again \n", e)
+			ErrorMessage("\n\nThe email [ " + e + " ] is not valid, please verify and try again! \n\n")
 		} else {
 			getApiData(e)
 		}
 	} else {
-		red("You must specify an email account [ USAGE -> gopwned verify <email> ]\n")
+		ErrorMessage("\n\nYou must specify an email account, run gopwned -h for more information. \n\n")
 	}
 }
 
@@ -42,9 +38,10 @@ func GetEmail(e string) {
  * gets the data from the API and returns the content to the users
  */
 func getApiData(e string) {
+	noBreaches := color.New(color.Bold, color.FgGreen).PrintlnFunc()
 	req, err := http.NewRequest("GET", URL_API+e, nil)
+
 	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
 		log.Fatal("Error getting the API: ", err)
 		return
 	}
@@ -52,7 +49,6 @@ func getApiData(e string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		raven.CaptureErrorAndWait(err, nil)
 		log.Fatal("Do: ", err)
 		return
 	}
@@ -67,22 +63,12 @@ func getApiData(e string) {
 
 	if len(breaches) > 0 {
 
-		c := color.New(color.FgRed).Add(color.Underline).Add(color.Bold)
-		c.Printf("\nBreaches for %v : \n\n", e)
-
-		const padding = 10
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', tabwriter.DiscardEmptyColumns)
-		fmt.Fprintf(w, "%v\t%v\n", color.RedString("Company"), color.RedString("Domain"))
-
-		for _, breach := range breaches {
-			fmt.Fprintln(w, "-"+color.WhiteString(breach.Title)+"\t"+" -"+color.WhiteString(breach.Domain))
+		breachTemplate := template.Must(template.New("breachMessage").Parse(breachTmpl))
+		if err := breachTemplate.Execute(os.Stdout, breaches); err != nil {
+			panic(err)
 		}
-		w.Flush()
 
-		tip := color.New(color.Bold, color.FgRed).PrintlnFunc()
-		tip("\n\nTIP: You can get detail information using -> gopwned verify user@example.com --domain adobe.com \n\n")
 	} else {
-		noBreaches := color.New(color.Bold, color.FgGreen).PrintlnFunc()
-		noBreaches("\n\nThe email [ " + e + " ] is safe for now! \n\n")
+		noBreaches("\n\nThe email [ " + e + " ] is safe for now, update your passwords often! \n\n")
 	}
 }
