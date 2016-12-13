@@ -11,7 +11,7 @@ Affected Companies:
 
 	Name
 {{range .}}
-	-{{.Name}} [{{.BreachDate}}]
+	-{{.Name}}  Breach Date -> {{.BreachDate}}
 {{end}}
 
 TIP: You can get detail information using: gopwned company <name>
