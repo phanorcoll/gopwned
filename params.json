@@ -1,6 +1,6 @@
 {
   "name": "Gopwned",
   "tagline": "",
-  "body": "# Gopwned CLI #\r\n\r\n\r\n\r\n### What is this repository for? ###\r\n\r\nA command line interface **CLI** to search for a email account in the [**PWNED**](https://haveibeenpwned.com/)\r\nAPI and determine if it has been compromised in a security breach.\r\n\r\n### How do I get set up? ###\r\n\r\n*   Clone the repository in the src directory of the go configuration\r\n",
+  "body": "# Gopwned CLI #\r\n\r\n\r\n\r\n### What is this repository for? ###\r\n\r\nA command line interface **CLI** to search for an email account in the [**PWNED**](https://haveibeenpwned.com/)\r\nAPI and determine if it has been compromised in a security breach.\r\n\r\n### How do I get set up? ###\r\n\r\n*   Clone the repository in the src directory of the go configuration\r\n\r\n### Initial CLI commands ###\r\n\r\n*   gopwned verify email\r\n*   gopwned company name\r\n\r\nto get the complete help of the CLI just type gopwned -h\r\n",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
