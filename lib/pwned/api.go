@@ -24,6 +24,8 @@ type PwnedData struct {
 const URL_API string = "https://haveibeenpwned.com/api/v2/breachedaccount/"
 const URL_API_BREACH string = "https://haveibeenpwned.com/api/v2/breach/"
 
+//Verify the email's format or if the email has been passed before
+//getting the list of breaches for that particular email
 func GetBreaches(e string) {
 	ErrorMessage := color.New(color.Bold, color.FgRed).PrintlnFunc()
 	if e != "" {
@@ -37,6 +39,7 @@ func GetBreaches(e string) {
 	}
 }
 
+//Verify that a parameter has been passed before getting the information about a company's breach
 func GetBreachData(nameCompany string) {
 	ErrorMessage := color.New(color.Bold, color.FgRed).PrintlnFunc()
 	if nameCompany != "" {
@@ -46,6 +49,7 @@ func GetBreachData(nameCompany string) {
 	}
 }
 
+//Gets the breach information for a particular company
 func breachData(nameCompany string) {
 	noBreaches := color.New(color.Bold, color.FgGreen).PrintlnFunc()
 	req, err := http.NewRequest("GET", URL_API_BREACH+nameCompany, nil)
@@ -82,9 +86,7 @@ func breachData(nameCompany string) {
 	}
 }
 
-/**
- * gets the data from the API and returns the content to the users
- */
+//Gets the data from the API and returns the content to the users
 func breachList(e string) {
 	noBreaches := color.New(color.Bold, color.FgGreen).PrintlnFunc()
 	req, err := http.NewRequest("GET", URL_API+e, nil)

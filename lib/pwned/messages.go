@@ -1,5 +1,6 @@
 package pwned
 
+//Template for showing the list of breaches to the user
 const breachesTmpl = `
 
 Hello!
@@ -17,6 +18,8 @@ Affected Companies:
 TIP: You can get detail information using: gopwned company <name>
 
 `
+
+//Template for showing the information about a company's security breach
 const breachTmpl = `
 
 Information about the breach
