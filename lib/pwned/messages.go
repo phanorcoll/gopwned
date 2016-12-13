@@ -9,9 +9,9 @@ The email account has been compromised in a security breach related to the follo
 
 Affected Companies:
 
-	Name			Breach Date:
+	Name
 {{range .}}
-	-{{.Name}}			*{{.BreachDate}}
+	-{{.Name}} [{{.BreachDate}}]
 {{end}}
 
 TIP: You can get detail information using: gopwned company <name>
