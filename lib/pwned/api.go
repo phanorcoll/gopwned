@@ -64,13 +64,13 @@ func breachData(nameCompany string) {
 
 	defer resp.Body.Close()
 
-	var bData []PwnedData
+	var bData PwnedData
 
 	if err := json.NewDecoder(resp.Body).Decode(&bData); err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
-	if len(bData) > 0 {
+	if bData.Name != "" {
 
 		breachTemplate := template.Must(template.New("breachMessage").Parse(breachTmpl))
 		if err := breachTemplate.Execute(os.Stdout, bData); err != nil {
@@ -78,7 +78,7 @@ func breachData(nameCompany string) {
 		}
 
 	} else {
-		noBreaches("\n\n The company [ " + nameCompany + " ] is not in out database, please verify the name and try again! \n\n")
+		noBreaches("\n\n The company [ " + nameCompany + " ] is not in our database, please verify the name and try again! \n\n")
 	}
 }
 
